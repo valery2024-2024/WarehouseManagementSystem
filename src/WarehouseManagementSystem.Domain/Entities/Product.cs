@@ -1,3 +1,4 @@
+using WarehouseManagementSystem.Domain.Exceptions;
 namespace WarehouseManagementSystem.Domain.Entities;
 
 public class Product
@@ -37,7 +38,7 @@ public class Product
     {
         if (amount <= 0)
         {
-            throw new ArgumentException("Amount must be greater than zero.");
+            throw new InvalidQuantityException("Amount must be greater than zero.");
         }
 
         Quantity += amount;
@@ -52,7 +53,7 @@ public class Product
 
         if (amount > Quantity)
         {
-            throw new InvalidOperationException("Not enough items in stock.");
+            throw new InsufficientStockException("Not enough items in stock.");
         }
 
         Quantity -= amount;
