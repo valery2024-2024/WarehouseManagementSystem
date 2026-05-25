@@ -25,10 +25,10 @@ public class Order
                 "Кількість повинна бути більше 0.");
         }
 
-        if (totalPrice < 0)
+        if (totalPrice <= 0)
         {
             throw new ArgumentException(
-                "Сума не може бути від'ємною.");
+                "Сума повинна бути більше 0.");
         }
 
         Id = Guid.NewGuid();

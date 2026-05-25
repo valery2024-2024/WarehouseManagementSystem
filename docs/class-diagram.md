@@ -8,48 +8,78 @@ class Product {
     +string Name
     +decimal Price
     +int Quantity
-    +AddQuantity()
-    +RemoveQuantity()
-}
 
-class Category {
-    +Guid Id
-    +string Name
-}
-
-class Supplier {
-    +Guid Id
-    +string Name
-    +string Email
-}
-
-class Warehouse {
-    +Guid Id
-    +string Name
-    +string Address
-}
-
-class StockItem {
-    +Guid Id
-    +Product Product
-    +Warehouse Warehouse
-    +int Quantity
+    +IncreaseQuantity()
+    +DecreaseQuantity()
 }
 
 class Order {
     +Guid Id
-    +List<Product> Products
-    +GetTotalPrice()
+    +Guid ProductId
+    +int Quantity
+    +decimal TotalPrice
+    +DateTime CreatedAt
+    +string Status
+
+    +Complete()
+    +Cancel()
 }
 
 class ProductService {
     +AddProduct()
-    +GetProducts()
+    +GetAllProducts()
+    +FindByName()
+    +GetProductById()
+    +UpdateProduct()
+
+    +GetProductsSortedByPrice()
+    +GetProductsSortedByQuantity()
+
+    +GetLowStockProducts()
+
+    +GetTotalInventoryValue()
+    +GetTotalProductsCount()
+
+    +GetMostExpensiveProduct()
+    +GetCheapestProduct()
+
+    +GetAveragePrice()
 }
 
 class OrderService {
     +CreateOrder()
-    +GetOrders()
+
+    +GetAllOrders()
+
+    +GetTotalRevenue()
+    +GetTotalOrdersCount()
+    +GetAverageOrderValue()
+
+    +GetLargestOrder()
+
+    +GetOrderAnalytics()
+    +GetTopSellingProducts()
+}
+
+class IDiscountStrategy {
+    <<interface>>
+    +ApplyDiscount()
+}
+
+class GoldDiscountStrategy {
+    +ApplyDiscount()
+}
+
+class SilverDiscountStrategy {
+    +ApplyDiscount()
+}
+
+class RegularDiscountStrategy {
+    +ApplyDiscount()
+}
+
+class DiscountStrategyFactory {
+    +Create()
 }
 
 class IProductRepository {
@@ -57,6 +87,7 @@ class IProductRepository {
     +Add()
     +GetAll()
     +GetById()
+    +Update()
 }
 
 class IOrderRepository {
@@ -69,6 +100,7 @@ class InMemoryProductRepository {
     +Add()
     +GetAll()
     +GetById()
+    +Update()
 }
 
 class InMemoryOrderRepository {
@@ -76,14 +108,39 @@ class InMemoryOrderRepository {
     +GetAll()
 }
 
+class IDataStore~T~ {
+    <<interface>>
+    +LoadAsync()
+    +SaveAsync()
+}
+
+class JsonProductDataStore {
+    +LoadAsync()
+    +SaveAsync()
+}
+
+class CreateOrderRequest
+
+class OrderSummaryDto
+
+class OrderAnalyticsDto
+
+class ProductSalesDto
+
 ProductService --> IProductRepository
 OrderService --> IOrderRepository
 
 InMemoryProductRepository ..|> IProductRepository
 InMemoryOrderRepository ..|> IOrderRepository
 
-StockItem --> Product
-StockItem --> Warehouse
+GoldDiscountStrategy ..|> IDiscountStrategy
+SilverDiscountStrategy ..|> IDiscountStrategy
+RegularDiscountStrategy ..|> IDiscountStrategy
 
-Order --> Product
+DiscountStrategyFactory --> IDiscountStrategy
+
+JsonProductDataStore ..|> IDataStore~T~
+
+OrderService --> DiscountStrategyFactory
+OrderService --> ProductService
 ```

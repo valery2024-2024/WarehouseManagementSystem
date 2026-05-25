@@ -1,18 +1,45 @@
-# Sequence Diagram
+# Sequence Diagram — Order Processing
 
 ```mermaid
 sequenceDiagram
 
 actor User
 
-participant Console
-participant ProductService
+participant ConsoleUI
+participant OrderService
 participant ProductRepository
+participant DiscountStrategyFactory
+participant DiscountStrategy
+participant OrderRepository
+participant JsonDataStore
 
-User ->> Console: Add Product
-Console ->> ProductService: AddProduct(name, price, quantity)
-ProductService ->> ProductRepository: Add(product)
-ProductRepository -->> ProductService: Product saved
-ProductService -->> Console: Success
-Console -->> User: Product added
+User ->> ConsoleUI: Create Order
+
+ConsoleUI ->> OrderService: CreateOrder(productId, quantity, discountType)
+
+OrderService ->> ProductRepository: GetById(productId)
+
+ProductRepository -->> OrderService: Product
+
+OrderService ->> DiscountStrategyFactory: Create(discountType)
+
+DiscountStrategyFactory -->> OrderService: DiscountStrategy
+
+OrderService ->> DiscountStrategy: ApplyDiscount(totalPrice)
+
+DiscountStrategy -->> OrderService: finalPrice
+
+OrderService ->> ProductRepository: Update(product)
+
+ProductRepository ->> JsonDataStore: SaveAsync()
+
+JsonDataStore -->> ProductRepository: Saved
+
+OrderService ->> OrderRepository: Add(order)
+
+OrderRepository -->> OrderService: Order Saved
+
+OrderService -->> ConsoleUI: Order Created
+
+ConsoleUI -->> User: Show Order Result
 ```
