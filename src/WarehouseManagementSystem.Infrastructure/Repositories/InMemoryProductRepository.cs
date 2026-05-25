@@ -26,22 +26,7 @@ public class InMemoryProductRepository : IProductRepository
     {
         _products.Add(product);
 
-        _dataStore
-            .SaveAsync(_products)
-            .GetAwaiter()
-            .GetResult();
-    }
-
-    public void Update(Product product)
-    {
-        var index = _products.FindIndex(p => p.Id == product.Id);
-
-        if (index == -1)
-        {
-            return;
-        }
-        _products[index] = product;
-        _dataStore.SaveAsync(_products).GetAwaiter().GetResult();
+        SaveChanges();
     }
 
     public IReadOnlyCollection<Product> GetAll()
@@ -52,5 +37,29 @@ public class InMemoryProductRepository : IProductRepository
     public Product? GetById(Guid id)
     {
         return _products.FirstOrDefault(p => p.Id == id);
+    }
+
+    public void Update(Product product)
+    {
+        var existingProduct = GetById(product.Id);
+
+        if (existingProduct is null)
+        {
+            return;
+        }
+
+        var index = _products.IndexOf(existingProduct);
+
+        _products[index] = product;
+
+        SaveChanges();
+    }
+
+    private void SaveChanges()
+    {
+        _dataStore
+            .SaveAsync(_products)
+            .GetAwaiter()
+            .GetResult();
     }
 }

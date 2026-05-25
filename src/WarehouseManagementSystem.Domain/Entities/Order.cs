@@ -4,29 +4,53 @@ public class Order
 {
     public Guid Id { get; private set; }
 
-    public List<Product> Products { get; private set; }
+    public Guid ProductId { get; private set; }
+
+    public int Quantity { get; private set; }
+
+    public decimal TotalPrice { get; private set; }
 
     public DateTime CreatedAt { get; private set; }
 
-    public Order()
-    {
-        Id = Guid.NewGuid();
-        Products = new List<Product>();
-        CreatedAt = DateTime.UtcNow;
-    }
+    public string Status { get; private set; }
 
-    public void AddProduct(Product product)
+    public Order(
+        Guid productId,
+        int quantity,
+        decimal totalPrice)
     {
-        if (product == null)
+        if (quantity <= 0)
         {
-            throw new ArgumentNullException(nameof(product));
+            throw new ArgumentException(
+                "Кількість повинна бути більше 0.");
         }
 
-        Products.Add(product);
+        if (totalPrice < 0)
+        {
+            throw new ArgumentException(
+                "Сума не може бути від'ємною.");
+        }
+
+        Id = Guid.NewGuid();
+
+        ProductId = productId;
+
+        Quantity = quantity;
+
+        TotalPrice = totalPrice;
+
+        CreatedAt = DateTime.UtcNow;
+
+        Status = "Created";
     }
 
-    public decimal GetTotalPrice()
+    public void Complete()
     {
-        return Products.Sum(p => p.Price);
+        Status = "Completed";
+    }
+
+    public void Cancel()
+    {
+        Status = "Cancelled";
     }
 }

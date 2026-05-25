@@ -22,11 +22,23 @@ public class ProductService
         return _productRepository.GetAll();
     }
 
-    public Product? FindByName(string name)
+    public Product? GetProductById(Guid id)
+    {
+        return _productRepository.GetById(id);
+    }
+
+    public void UpdateProduct(Product product)
+    {
+        _productRepository.Update(product);
+    }
+
+    public IReadOnlyCollection<Product> FindByName(string name)
     {
         return _productRepository
             .GetAll()
-            .FirstOrDefault(p => p.Name.ToLower() == name.ToLower());
+            .Where(p => p.Name
+                .Contains(name, StringComparison.OrdinalIgnoreCase))
+            .ToList();
     }
 
     public IReadOnlyCollection<Product> GetProductsSortedByPrice()
@@ -34,6 +46,14 @@ public class ProductService
         return _productRepository
             .GetAll()
             .OrderBy(p => p.Price)
+            .ToList();
+    }
+
+    public IReadOnlyCollection<Product> GetProductsSortedByQuantity()
+    {
+        return _productRepository
+            .GetAll()
+            .OrderByDescending(p => p.Quantity)
             .ToList();
     }
 
@@ -50,5 +70,40 @@ public class ProductService
         return _productRepository
             .GetAll()
             .Sum(p => p.Price * p.Quantity);
+    }
+
+    public int GetTotalProductsCount()
+    {
+        return _productRepository
+            .GetAll()
+            .Count;
+    }
+
+    public Product? GetMostExpensiveProduct()
+    {
+        return _productRepository
+            .GetAll()
+            .OrderByDescending(p => p.Price)
+            .FirstOrDefault();
+    }
+
+    public Product? GetCheapestProduct()
+    {
+        return _productRepository
+            .GetAll()
+            .OrderBy(p => p.Price)
+            .FirstOrDefault();
+    }
+
+    public decimal GetAveragePrice()
+    {
+        var products = _productRepository.GetAll();
+
+        if (!products.Any())
+        {
+            return 0;
+        }
+
+        return products.Average(p => p.Price);
     }
 }

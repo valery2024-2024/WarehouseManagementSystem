@@ -1,9 +1,7 @@
 using WarehouseManagementSystem.Application.DTOs;
 using WarehouseManagementSystem.Application.Factories;
 using WarehouseManagementSystem.Application.Interfaces;
-using WarehouseManagementSystem.Application.Policies;
 using WarehouseManagementSystem.Domain.Entities;
-using WarehouseManagementSystem.Domain.Exceptions;
 
 namespace WarehouseManagementSystem.Application.Services;
 
@@ -13,93 +11,130 @@ public class OrderService
 
     private readonly IProductRepository _productRepository;
 
-    private readonly MinimumOrderPolicy _minimumOrderPolicy;
-
-    private readonly StockAvailabilityPolicy _stockPolicy;
-
     public OrderService(
         IOrderRepository orderRepository,
         IProductRepository productRepository)
     {
         _orderRepository = orderRepository;
         _productRepository = productRepository;
-
-        _minimumOrderPolicy = new MinimumOrderPolicy();
-        _stockPolicy = new StockAvailabilityPolicy();
     }
 
-    public OrderSummaryDto ProcessOrder(CreateOrderRequest request)
+    public Order CreateOrder(
+        Guid productId,
+        int quantity,
+        string discountType)
     {
-        var product = _productRepository
-            .GetAll()
-            .FirstOrDefault(p =>
-                p.Name.Equals(
-                    request.ProductName,
-                    StringComparison.OrdinalIgnoreCase));
+        var product = _productRepository.GetById(productId);
 
         if (product is null)
         {
-            throw new InvalidOrderException("Товар не знайдено.");
+            throw new InvalidOperationException(
+                "Товар не знайдено.");
         }
 
-        ValidateOrder(product, request.Quantity);
+        if (quantity <= 0)
+        {
+            throw new ArgumentException(
+                "Кількість повинна бути більше 0.");
+        }
 
-        decimal totalPrice = product.Price * request.Quantity;
+        if (product.Quantity < quantity)
+        {
+            throw new InvalidOperationException(
+                "Недостатньо товару на складі.");
+        }
 
-        var discountStrategy =
-            DiscountStrategyFactory.Create(request.DiscountType);
+        var strategy =
+            DiscountStrategyFactory.Create(discountType);
+
+        decimal originalPrice =
+            product.Price * quantity;
 
         decimal finalPrice =
-            discountStrategy.ApplyDiscount(totalPrice);
+            strategy.ApplyDiscount(originalPrice);
 
-        var order = new Order();
-
-        for (int i = 0; i < request.Quantity; i++)
-        {
-            order.AddProduct(product);
-        }
-
-        product.RemoveQuantity(request.Quantity);
+        product.DecreaseQuantity(quantity);
 
         _productRepository.Update(product);
 
+        var order = new Order(
+            product.Id,
+            quantity,
+            finalPrice);
+
         _orderRepository.Add(order);
 
-        return new OrderSummaryDto
-        {
-            OrderId = order.Id,
-            ProductName = product.Name,
-            Quantity = request.Quantity,
-            TotalPrice = totalPrice,
-            FinalPrice = finalPrice,
-            CreatedAt = order.CreatedAt
-        };
+        return order;
     }
 
-    public void CreateOrder(Order order)
-    {
-        _orderRepository.Add(order);
-    }
-
-    public IReadOnlyCollection<Order> GetOrders()
+    public IReadOnlyCollection<Order> GetAllOrders()
     {
         return _orderRepository.GetAll();
     }
 
-    public void ValidateOrder(Product product, int quantity)
+    public decimal GetTotalRevenue()
     {
-        decimal totalAmount = product.Price * quantity;
+        return _orderRepository
+            .GetAll()
+            .Sum(o => o.TotalPrice);
+    }
 
-        if (!_minimumOrderPolicy.IsValid(totalAmount))
+    public int GetTotalOrdersCount()
+    {
+        return _orderRepository
+            .GetAll()
+            .Count;
+    }
+
+    public decimal GetAverageOrderValue()
+    {
+        var orders = _orderRepository.GetAll();
+
+        if (!orders.Any())
         {
-            throw new InvalidOrderException(
-                "Мінімальна сума замовлення 500 грн.");
+            return 0;
         }
 
-        if (!_stockPolicy.IsAvailable(product, quantity))
-        {
-            throw new InvalidOrderException(
-                "Недостатньо товару на складі.");
-        }
+        return orders.Average(o => o.TotalPrice);
+    }
+
+    public Order? GetLargestOrder()
+    {
+        return _orderRepository
+            .GetAll()
+            .OrderByDescending(o => o.TotalPrice)
+            .FirstOrDefault();
+    }
+
+    public IReadOnlyCollection<OrderAnalyticsDto>
+        GetOrderAnalytics()
+    {
+        return _orderRepository
+            .GetAll()
+            .Select(o => new OrderAnalyticsDto
+            {
+                OrderId = o.Id,
+                ProductId = o.ProductId,
+                Quantity = o.Quantity,
+                TotalPrice = o.TotalPrice,
+                CreatedAt = o.CreatedAt
+            })
+            .ToList();
+    }
+
+    public IReadOnlyCollection<ProductSalesDto>
+        GetTopSellingProducts()
+    {
+        return _orderRepository
+            .GetAll()
+            .GroupBy(o => o.ProductId)
+            .Select(group => new ProductSalesDto
+            {
+                ProductId = group.Key,
+                TotalSold = group.Sum(x => x.Quantity),
+                Revenue = group.Sum(x => x.TotalPrice)
+            })
+            .OrderByDescending(x => x.TotalSold)
+            .ToList();
     }
 }
