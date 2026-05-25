@@ -1,26 +1,38 @@
 [
   {
-    "Id": "a3692baf-db01-4942-b3d9-dc442f9811f3",
+    "Id": "f7282767-b2c6-4222-a582-2b5e3a123abb",
     "Name": "Laptop",
     "Price": 50000,
     "Quantity": 5
   },
   {
-    "Id": "1c87b6f4-427d-4409-9d9f-280238f032ca",
+    "Id": "30d82241-993d-40ac-a1c5-4032032b7b68",
     "Name": "Lenovo Idea Pad",
     "Price": 21000,
     "Quantity": 3
   },
   {
-    "Id": "a807bc9f-5ce0-46dc-866c-7406a179fdbc",
+    "Id": "55dbc6fc-2a42-46a9-90a6-d3a3ba72f0d6",
     "Name": "Poco X3 NFC",
     "Price": 7500,
     "Quantity": 3
   },
   {
-    "Id": "5c8003cc-bcd3-4d11-9e36-4bda2025908f",
+    "Id": "3100b511-11f7-47e9-a3fe-08b24cacd694",
     "Name": "Samsung Galaxy S24 Ultra 1tb",
     "Price": 67000,
     "Quantity": 2
+  },
+  {
+    "Id": "bf4905b1-f3b0-45f1-ad2d-4f8043ca2629",
+    "Name": "Logitech L2000",
+    "Price": 2450,
+    "Quantity": 3
+  },
+  {
+    "Id": "574b4230-29cd-4b4b-8642-4cb667b1e29d",
+    "Name": "Logitech",
+    "Price": 1000,
+    "Quantity": 1
   }
 ]
