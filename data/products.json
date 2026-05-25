@@ -1,0 +1,26 @@
+[
+  {
+    "Id": "a3692baf-db01-4942-b3d9-dc442f9811f3",
+    "Name": "Laptop",
+    "Price": 50000,
+    "Quantity": 5
+  },
+  {
+    "Id": "1c87b6f4-427d-4409-9d9f-280238f032ca",
+    "Name": "Lenovo Idea Pad",
+    "Price": 21000,
+    "Quantity": 3
+  },
+  {
+    "Id": "a807bc9f-5ce0-46dc-866c-7406a179fdbc",
+    "Name": "Poco X3 NFC",
+    "Price": 7500,
+    "Quantity": 3
+  },
+  {
+    "Id": "5c8003cc-bcd3-4d11-9e36-4bda2025908f",
+    "Name": "Samsung Galaxy S24 Ultra 1tb",
+    "Price": 67000,
+    "Quantity": 2
+  }
+]

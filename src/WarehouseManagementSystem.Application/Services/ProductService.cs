@@ -12,15 +12,43 @@ public class ProductService
         _productRepository = productRepository;
     }
 
-    public void AddProduct(string name, decimal price, int quantity)
+    public void AddProduct(Product product)
     {
-        var product = new Product(name, price, quantity);
-
         _productRepository.Add(product);
     }
 
-    public List<Product> GetProducts()
+    public IReadOnlyCollection<Product> GetAllProducts()
     {
         return _productRepository.GetAll();
+    }
+
+    public Product? FindByName(string name)
+    {
+        return _productRepository
+            .GetAll()
+            .FirstOrDefault(p => p.Name.ToLower() == name.ToLower());
+    }
+
+    public IReadOnlyCollection<Product> GetProductsSortedByPrice()
+    {
+        return _productRepository
+            .GetAll()
+            .OrderBy(p => p.Price)
+            .ToList();
+    }
+
+    public IReadOnlyCollection<Product> GetLowStockProducts(int minimumQuantity)
+    {
+        return _productRepository
+            .GetAll()
+            .Where(p => p.Quantity <= minimumQuantity)
+            .ToList();
+    }
+
+    public decimal GetTotalInventoryValue()
+    {
+        return _productRepository
+            .GetAll()
+            .Sum(p => p.Price * p.Quantity);
     }
 }

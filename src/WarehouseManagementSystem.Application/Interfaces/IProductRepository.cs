@@ -6,7 +6,7 @@ public interface IProductRepository
 {
     void Add(Product product);
 
-    List<Product> GetAll();
+    IReadOnlyCollection<Product> GetAll();
 
     Product? GetById(Guid id);
 }
