@@ -1,10 +1,18 @@
-﻿using WarehouseManagementSystem.Application.Services;
+﻿using WarehouseManagementSystem.Application.DTOs;
+using WarehouseManagementSystem.Application.Services;
 using WarehouseManagementSystem.Domain.Entities;
+using WarehouseManagementSystem.Domain.Exceptions;
 using WarehouseManagementSystem.Infrastructure.Repositories;
 
 var productRepository = new InMemoryProductRepository();
 
+var orderRepository = new InMemoryOrderRepository();
+
 var productService = new ProductService(productRepository);
+
+var orderService = new OrderService(
+    orderRepository,
+    productRepository);
 
 bool running = true;
 
@@ -18,6 +26,7 @@ while (running)
     Console.WriteLine("4. Сортування по ціні");
     Console.WriteLine("5. Товари з малою кількістю");
     Console.WriteLine("6. Загальна вартість складу");
+    Console.WriteLine("7. Оформити замовлення");
     Console.WriteLine("0. ВИХІД");
     Console.Write("Виберіть варіант: ");
 
@@ -49,6 +58,10 @@ while (running)
             ShowInventoryValue(productService);
             break;
 
+        case "7":
+            ProcessOrder(orderService);
+            break;
+
         case "0":
             running = false;
             break;
@@ -73,6 +86,7 @@ static void AddProduct(ProductService productService)
         int quantity = int.Parse(Console.ReadLine()!);
 
         var product = new Product(name, price, quantity);
+
         productService.AddProduct(product);
 
         Console.WriteLine("Продукт успішно додано.");
@@ -172,6 +186,54 @@ static void ShowInventoryValue(ProductService productService)
     decimal totalValue = productService.GetTotalInventoryValue();
 
     Console.WriteLine();
+
     Console.WriteLine(
         $"Загальна вартість складу: {totalValue}");
+}
+
+static void ProcessOrder(OrderService orderService)
+{
+    try
+    {
+        Console.Write("Введіть назву товару: ");
+        string productName = Console.ReadLine()!;
+
+        Console.Write("Введіть кількість: ");
+        int quantity = int.Parse(Console.ReadLine()!);
+
+        Console.Write("Тип знижки (Regular/Silver/Gold): ");
+        string discountType = Console.ReadLine()!;
+
+        var request = new CreateOrderRequest
+        {
+            ProductName = productName,
+            Quantity = quantity,
+            DiscountType = discountType
+        };
+
+        var result = orderService.ProcessOrder(request);
+
+        Console.WriteLine();
+        Console.WriteLine("=== Замовлення оформлено ===");
+
+        Console.WriteLine($"ID: {result.OrderId}");
+
+        Console.WriteLine($"Товар: {result.ProductName}");
+
+        Console.WriteLine($"Кількість: {result.Quantity}");
+
+        Console.WriteLine($"Сума без знижки: {result.TotalPrice}");
+
+        Console.WriteLine($"Фінальна сума: {result.FinalPrice}");
+
+        Console.WriteLine($"Дата: {result.CreatedAt}");
+    }
+    catch (InvalidOrderException ex)
+    {
+        Console.WriteLine($"Помилка замовлення: {ex.Message}");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Помилка: {ex.Message}");
+    }
 }

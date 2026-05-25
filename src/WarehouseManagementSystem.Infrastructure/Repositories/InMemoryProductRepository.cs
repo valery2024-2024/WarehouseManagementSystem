@@ -32,6 +32,18 @@ public class InMemoryProductRepository : IProductRepository
             .GetResult();
     }
 
+    public void Update(Product product)
+    {
+        var index = _products.FindIndex(p => p.Id == product.Id);
+
+        if (index == -1)
+        {
+            return;
+        }
+        _products[index] = product;
+        _dataStore.SaveAsync(_products).GetAwaiter().GetResult();
+    }
+
     public IReadOnlyCollection<Product> GetAll()
     {
         return _products.AsReadOnly();

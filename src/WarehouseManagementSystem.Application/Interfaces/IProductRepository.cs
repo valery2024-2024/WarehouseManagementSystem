@@ -9,4 +9,5 @@ public interface IProductRepository
     IReadOnlyCollection<Product> GetAll();
 
     Product? GetById(Guid id);
+    void Update(Product product);
 }
