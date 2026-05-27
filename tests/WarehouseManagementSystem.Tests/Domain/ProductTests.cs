@@ -38,7 +38,7 @@ public class ProductTests
     {
         var product = new Product("Laptop", 50000, 5);
 
-        product.AddQuantity(3);
+        product.IncreaseQuantity(3);
 
         Assert.Equal(8, product.Quantity);
     }
@@ -50,7 +50,7 @@ public class ProductTests
 
         Assert.Throws<InsufficientStockException>(() =>
         {
-            product.RemoveQuantity(10);
+            product.DecreaseQuantity(10);
         });
     }
 }

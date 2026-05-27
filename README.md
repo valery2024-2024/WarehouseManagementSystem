@@ -2,41 +2,125 @@
 
 ## Опис
 
-Warehouse Management System — це консольний застосунок для управління складом та товарами.
+Warehouse Management System — це консольний застосунок для управління складом, товарами та замовленнями.
 
-## Можливості
+Проєкт реалізований у рамках лабораторних робіт №34-35 та демонструє:
+
+- багатошарову архітектуру;
+- бізнес-логіку;
+- persistence layer;
+- LINQ-аналітику;
+- патерни проєктування;
+- automated testing.
+
+## Основні можливості
+
+### Управління товарами
 
 - додавання товарів;
 - перегляд товарів;
-- управління інвентарем;
+- пошук товарів;
+- сортування за ціною;
+- фільтрація товарів з малою кількістю.
+
+### Обробка замовлень
+
 - створення замовлень;
-- перевірка бізнес-правил.
+- автоматичне списання товарів;
+- перевірка залишків;
+- застосування знижок;
+- контроль бізнес-правил.
+
+### Аналітика
+
+- загальна вартість складу;
+- статистика замовлень;
+- LINQ-запити;
+- analytics dashboard.
 
 ## Архітектура
 
 Проєкт використовує багатошарову архітектуру:
 
-- Domain;
-- Application;
-- Infrastructure;
-- Console;
-- Tests.
+- Domain
+- Application
+- Infrastructure
+- Console
+- Tests
 
-## Технології
+## Використані технології
 
 - C#
 - .NET
+- LINQ
 - xUnit
-- GitHub
+- JSON Persistence
+- GitHub Actions CI
 
-## Запуск проєкту
+## Реалізовані патерни проєктування
 
-```bash
-dotnet run --project src/WarehouseManagementSystem.Console
-```
+### Strategy Pattern
 
-## Запуск тестів
+Використовується для системи знижок:
 
-```bash
-dotnet test
-```
+- RegularDiscountStrategy
+- SilverDiscountStrategy
+- GoldDiscountStrategy
+
+### Factory Pattern
+
+Використовується для створення discount strategies.
+
+### Repository Pattern
+
+Використовується для abstraction persistence layer.
+
+## Persistence Layer
+
+Реалізовано:
+
+- JSON persistence;
+- SaveAsync();
+- LoadAsync();
+- автоматичне відновлення стану програми.
+
+## Бізнес-правила
+
+Система перевіряє:
+
+- ціна товару не може бути від’ємною;
+- кількість товару не може бути від’ємною;
+- не можна оформити замовлення без товару;
+- не можна купити більше товару, ніж є на складі;
+- знижки застосовуються залежно від типу клієнта.
+
+## LINQ Функціонал
+
+Реалізовано:
+
+- сортування;
+- фільтрацію;
+- агрегацію;
+- analytics queries;
+- статистику продажів.
+
+## Структура проєкту
+
+```text
+src/
+ ├── WarehouseManagementSystem.Domain
+ ├── WarehouseManagementSystem.Application
+ ├── WarehouseManagementSystem.Infrastructure
+ ├── WarehouseManagementSystem.Console
+
+tests/
+ ├── WarehouseManagementSystem.Tests
+
+docs/
+ ├── vision.md
+ ├── backlog.md
+ ├── iteration-1.md
+ ├── iteration-2.md
+ ├── iteration-2-plan.md
+ 
+ ```
