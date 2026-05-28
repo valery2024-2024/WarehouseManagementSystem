@@ -52,5 +52,17 @@
     "Name": "Laptop L120",
     "Price": 100,
     "Quantity": 1
+  },
+  {
+    "Id": "90343442-9a8e-4b8d-97a6-a9c6cd2d4098",
+    "Name": "Laptop",
+    "Price": 50000,
+    "Quantity": 8
+  },
+  {
+    "Id": "19c1fade-873a-45f0-9a53-db42b17d8e95",
+    "Name": "Laptop",
+    "Price": 50000,
+    "Quantity": 8
   }
 ]

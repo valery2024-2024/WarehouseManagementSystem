@@ -12,8 +12,8 @@ public class InMemoryOrderRepository : IOrderRepository
         _orders.Add(order);
     }
 
-    public List<Order> GetAll()
+    public IReadOnlyCollection<Order> GetAll()
     {
-        return _orders;
+        return _orders.AsReadOnly();
     }
 }
